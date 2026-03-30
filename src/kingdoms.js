@@ -2,8 +2,8 @@
 //  KINGDOMS — All creature & organism step functions
 //  Edit this file to change creature behavior, add new kingdoms, etc.
 // ================================================================
-import { W, H, T } from './constants.js';
-import { grid, lightGrid, pheroGrid, POP, POP_MAX, gv, sunX, sunY, sunActive,
+import { W, H, T, POP_MAX, POP_GRAPH_MAX} from './constants.js';
+import { grid, lightGrid, pheroGrid, POP,  gv, sunX, sunY, sunActive,
          mutRate, customCreatures } from './state.js';
 import { idx, inB, get, getDens, getNeighbors, getPerp, swap,
          abiotic, agent, agentWithStrain, popIncr, popDecr, maybeMutateStrain,
