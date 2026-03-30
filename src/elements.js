@@ -498,7 +498,7 @@ export function stepMutagen(x,y,p){
 //  CLAY_HARD is immovable like a wall — but ants can dig through it.
 
 // ── Weather tick (rain events) ────────────────────────────────
-function weatherTick(){
+export function weatherTick(){
   if(!ws_rain_active) return;
   for(let d=0;d<ws_rain_rate;d++){
     const rx=Math.floor(Math.random()*W);
