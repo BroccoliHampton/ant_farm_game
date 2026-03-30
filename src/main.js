@@ -42,13 +42,15 @@ const wrap   = document.getElementById('canvas-wrap');
 let S = 4;
 
 function computeAndApplyS() {
-  const lw = (document.getElementById('left')  || {offsetWidth:130}).offsetWidth;
-  const rw = (document.getElementById('right') || {offsetWidth:150}).offsetWidth;
+  const left  = document.getElementById('left');
+  const right = document.getElementById('right');
+  const lw = (left  && left.offsetWidth  > 0) ? left.offsetWidth  : 140;
+  const rw = (right && right.offsetWidth > 0) ? right.offsetWidth : 160;
   const availW = Math.min(
     window.innerWidth  - lw - rw - 24,
     window.innerHeight * 0.88
   );
-  S = Math.max(2, Math.floor(availW / W));
+  S = Math.max(2, Math.floor(Math.max(availW, W * 2) / W));
   canvas.width  = W * S;
   canvas.height = H * S;
   wrap.style.width  = (W * S) + 'px';
@@ -253,9 +255,8 @@ document.addEventListener('keydown', e => {
 // ── Window resize ─────────────────────────────────────────────
 window.addEventListener('resize', computeAndApplyS);
 
-// ── BOOT — ES modules are always deferred, DOM is ready ──────
-// Use requestAnimationFrame to ensure layout has been painted
-requestAnimationFrame(() => {
+// ── BOOT — double rAF ensures layout is fully painted before measuring ──
+requestAnimationFrame(() => requestAnimationFrame(() => {
   computeAndApplyS();
   buildElementList();
   initToolButtons();
@@ -264,4 +265,4 @@ requestAnimationFrame(() => {
   resetSim();
   seedLife();
   requestAnimationFrame(loop);
-});
+}));
