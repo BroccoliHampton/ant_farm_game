@@ -19,9 +19,6 @@ export function mutateGenome(g,rate){
 }
 
 // Strain registry — unique genome strains per kingdom
-const strainRegistry=new Map(); // strainId -> {type,genome,color,pop,born,peak}
-let nextStrain=1;
-let mutRate=0.003;
 
 export function registerStrain(type,genome,parentId=null){
   const id=nextStrain++;
