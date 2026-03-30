@@ -37,8 +37,6 @@ export const T = {
 };
 
 // Fridge zones — {x1,y1,x2,y2} bounding boxes; mutagen inside = frozen
-let fridgeZones=[];
-function inFridge(x,y){ return fridgeZones.some(f=>x>f.x1&&x<f.x2&&y>f.y1&&y<f.y2); }
 
 // Density table
 // Abiotic density table (higher=heavier)
@@ -55,11 +53,6 @@ export const DENSITY={
   [T.SMOKE]:0.15,[T.WOOD]:4,[T.ASH]:0.8,[T.ACID]:2.1,[T.GUNPOWDER]:4.5,[T.SALT]:3,
 };
 
-function getDens(p){
-  if(!p) return 0;
-  if(p.g) return 2+(p.g[0]/255)*4; // genome density gene maps 2–6
-  return DENSITY[p.t]??2;
-}
 
 
 // Genome layout
