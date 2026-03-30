@@ -426,7 +426,6 @@ export function drawAt(cx,cy){
 // ================================================================
 //  BOX DRAW — drag to size a hollow box
 // ================================================================
-let boxDrawStart=null; // {gx,gy,px,py} grid + pixel coords of first corner
 
 
 // ── Stamp Tool ───────────────────────────────────────────────
@@ -589,7 +588,6 @@ const STAMPS={
 // ================================================================
 //  GRAB / HELD MUTAGEN
 // ================================================================
-let heldMutagen=null;
 
 export function dropHeld(){
   heldMutagen=null;
@@ -834,14 +832,9 @@ const TRAIT_OPTIONS = {
 const CREATURE_ICONS=['🐜','🐛','🦗','🦟','🐞','🦂','🦀','🐙','🦑','🐚','🐌','🦋','🐝','🪲','🪳','🦠','👾','👽','🤖','💀','👻','🔮','💎','⭐','🌟','✨','🌀','❄️','⚡','🌊','🍄','🌸','🌺','💜','💙','💚','💛','🧡','❤️'];
 
 // Custom creature state
-const customCreatures = new Map();
-let nextCustomId = T.CUSTOM_BASE;
 let pendingCreature = null;
-let selectedCustom = null;
 let selectedIsQueen = false;
-let historySelectedId = null;
 // Observe mode state
-let observeMode = false;
 let savedSpeedMult = 1;
 
 // ================================================================
