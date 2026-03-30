@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alien Ant Farm — Sandscape Evolution</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Google Fonts loaded async to avoid render blocking -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<!-- HOVER TOOLTIP -->
+<div id="hover-tip"></div>
+
+<!-- LEFT -->
+<div id="left">
+  <div><div class="logo">ALIEN <span>ANT FARM</span></div><div style="font-size:7px;color:var(--dim);letter-spacing:2px;margin-top:1px;">ALIEN ANT FARM</div></div>
+
+  <div><div class="lbl">TOOL</div>
+    <div class="tool-grid" style="margin-top:4px;">
+      <button class="tbtn active" data-tool="draw" id="btn-draw">DRAW</button>
+      <button class="tbtn" data-tool="erase">ERASE</button>
+      <button class="tbtn" data-tool="sun">☀ SUN</button>
+      <button class="tbtn" data-tool="stamp">⬛ STAMP</button>
+      <button class="tbtn wide" data-tool="observe" id="btn-observe">👁 OBSERVE</button>
+      <button class="tbtn wide" data-tool="grab" id="btn-grab">✋ GRAB SEED</button>
+    </div>
+    <div id="stamp-picker" style="display:none;margin-top:4px;">
+      <select id="stamp-sel" style="background:var(--panel);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:7px;padding:3px;width:100%;">
+        <option value="box_draw">⬛ DRAW BOX (drag)</option>
+        <option value="box">□ BOX (preset)</option>
+        <option value="bowl">⌣ BOWL</option>
+        <option value="tube">| TUBE</option>
+        <option value="funnel">▽ FUNNEL</option>
+        <option value="divider">— DIVIDER</option>
+        <option value="cross">✛ CROSS</option>
+        <option value="fridge">❄ FRIDGE</option>
+        <option value="weatherstation">🌡 WEATHER STATION</option>
+        <option value="frogstone">🐸 FROGSTONE</option>
+      </select>
+      <div id="stamp-hint" style="font-size:7px;color:var(--accent3);margin-top:3px;display:none;">Click + drag to draw box</div>
+    </div>
+  </div>
+
+  <div><div class="lbl">ELEMENT</div><div style="display:flex;flex-direction:column;gap:2px;margin-top:3px;" id="elist"></div></div>
+
+  <div class="srow"><label>BRUSH — <span id="bsv">3</span></label><input type="range" id="bs" min="1" max="10" value="3"></div>
+  <div class="srow"><label>TIME — <span class="sv" id="spv">1.0x</span></label><input type="range" id="sp" min="0" max="20" value="5"></div>
+  <div class="srow"><label>MUTATION — <span class="sv" id="muv">0.3%</span></label><input type="range" id="mu" min="0" max="80" value="3"></div>
+
+  <div><div class="lbl">ROTATE BOX</div>
+    <div id="ang">0°</div>
+    <div style="display:flex;gap:4px;"><button class="rot-btn" id="rccw" style="grid-column:span 2;">⟳ FLIP 180°</button><button class="rot-btn" id="rcw" style="display:none;"></button></div>
+    <div style="font-size:6px;color:var(--dim);text-align:center;margin-top:3px;line-height:1.5">GRAVITY ↓ ALWAYS<br>BOX TIPS AROUND IT</div>
+  </div>
+
+  <div>
+    <div class="lbl">POPULATIONS</div>
+    <div id="pop-tracker" style="margin-top:5px;display:flex;flex-direction:column;gap:4px;"></div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:3px;">
+    <button class="abtn lab" onclick="openLab()">🧬 CREATURE LAB</button>
+    <button class="abtn" style="border-color:var(--accent3);color:var(--accent3);" onclick="randomMap()">🎲 RANDOM WORLD</button>
+    <button class="abtn" onclick="seedLife()">🌱 SEED ECOSYSTEM</button>
+    <button class="abtn" onclick="openDocs()">? FIELD MANUAL</button>
+    <button class="abtn dang" onclick="resetSim()">↺ RESET</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div id="main">
+  <div style="display:flex;align-items:center;gap:12px;flex-shrink:0;">
+    <div><div id="tick">0</div><div id="tl">TICKS</div></div>
+    <div id="era">ERA: PRIMORDIAL</div>
+  </div>
+  <div id="canvas-outer">
+    <div id="canvas-wrap">
+      <canvas id="c"></canvas>
+      <div id="pause-badge">⏸ PAUSED</div>
+      <div id="observe-badge">👁 OBSERVE MODE</div>
+      <div id="box-preview" style="display:none;position:absolute;border:2px dashed rgba(68,136,255,0.8);background:rgba(68,136,255,0.08);pointer-events:none;box-sizing:border-box;"></div>
+    </div>
+  </div>
+  <div id="hint-text" style="font-size:7px;color:var(--dim);transition:transform 0.5s;">CLICK+DRAG DRAW · SCROLL=BRUSH · RIGHT-CLICK=INSPECT · ↺↻ ROTATE</div>
+</div>
+
+<!-- RIGHT -->
+<div id="right">
+  <div><div class="lbl">ECOSYSTEM</div>
+    <div style="margin-top:4px;display:flex;flex-direction:column;gap:1px;" id="estats"></div>
+  </div>
+  <div><div class="lbl">POPULATIONS</div><div id="kbars" style="margin-top:4px;"></div></div>
+
+  <div><div class="lbl">NARRATOR</div>
+    <div id="narrator" style="font-size:8px;color:var(--text);margin-top:4px;line-height:1.7;font-style:italic;min-height:60px;"></div>
+  </div>
+  <div><div class="lbl">INSPECT</div>
+    <div id="iinfo" style="font-size:8px;color:var(--dim);margin-top:4px;line-height:1.6;">Hover or right-click a cell.</div>
+  </div>
+  <div><div class="lbl">CUSTOM CREATURES</div>
+    <div id="custom-list" style="margin-top:4px;max-height:120px;overflow-y:auto;"></div>
+    <button class="abtn lab" style="margin-top:5px;font-size:6px;padding:4px;" onclick="openLab()">🧬 CREATURE LAB</button>
+  </div>
+  <div><div class="lbl">KINGDOMS</div><div id="klist" style="margin-top:4px;"></div></div>
+  <div id="held-panel" style="display:none;border:1px solid var(--accent3);padding:5px 6px;margin-top:4px;">
+    <div style="font-size:7px;color:var(--accent3);letter-spacing:2px;">HOLDING MUTAGEN</div>
+    <div id="held-info" style="font-size:7px;color:var(--dim);margin-top:3px;line-height:1.5;"></div>
+    <button onclick="dropHeld()" style="margin-top:4px;background:transparent;border:1px solid var(--border);color:var(--dim);font-family:var(--mono);font-size:7px;padding:3px 6px;cursor:pointer;width:100%;letter-spacing:1px;">✕ DISCARD</button>
+  </div>
+</div><!-- end right panel -->
+
+<!-- EVENT TOAST -->
+<div id="event-toast">
+  <div class="et-name" id="et-name"></div>
+  <div class="et-desc" id="et-desc"></div>
+</div>
+
+<!-- DOCS OVERLAY -->
+<div id="docs-overlay">
+<div id="docs-panel">
+  <button id="docs-close" onclick="closeDocs()">✕ CLOSE</button>
+  <div class="docs-h1">ALIEN ANT FARM</div>
+  <div class="docs-p" style="color:var(--dim);font-size:8px;letter-spacing:1px;">FIELD MANUAL — ALIEN ANT FARM</div>
+
+  <div class="docs-h2">WHAT IS THIS</div>
+  <div class="docs-p">Sandscape is a living terrarium simulator. You build an environment from sand, water, clay and nutrients, then introduce five kingdoms of life that compete, cooperate, and evolve. Every organism has a genome — genes that drift over generations, creating new strains adapted to your specific terrarium. No two runs are the same.</div>
+  <div class="docs-p">The board obeys <b>physical gravity</b> at all times. Rotating the box with ↺↻ tips the entire world — sand slides, water pools, organisms fall and find new surfaces. Use this to reshape the ecosystem dynamically.</div>
+
+  <div class="docs-h2">THE FOOD WEB</div>
+  <div class="docs-p">The ecosystem runs on a single closed energy loop. Break any link and the whole system eventually collapses:</div>
+  <div class="docs-tip"><b>☀ SUN → 🌿 PLANTS → 🐜 ANTS → 👑 QUEEN → 🐜 ANTS → 🕷 SPIDERS → 💀 DEATH → 🍂 DETRITUS → 🍄 FUNGI → 🪲 MITES → 🐜 ANTS</b></div>
+  <div class="docs-p">The sun is the only <em>external</em> energy input. Everything else recycles. If the sun is off, plants starve, ants starve, the whole web collapses within a few hundred ticks.</div>
+
+  <div class="docs-h2">THE FIVE KINGDOMS</div>
+  <div class="docs-grid">
+    <div class="docs-kcard">
+      <div class="dk-name" style="color:#28b43c">🌿 PLANT</div>
+      <div class="dk-body">Grows toward the sun one cell at a time. Roots in sand, gold sand, or detritus. Older cells harden into woody stems (plant wall) which slowly drop leaf litter (detritus). Eaten by ants — without plant coverage, ants starve.</div>
+    </div>
+    <div class="docs-kcard">
+      <div class="dk-name" style="color:#dc2828">🐜 ANT</div>
+      <div class="dk-body">Falls through air, walks on all solid surfaces. Eats plants and mites. When energy reaches 220 with no queen nearby, an ant spontaneously crowns a new queen. Feeds queens it passes near. Tunnels through hardened clay, leaving open passages.</div>
+    </div>
+    <div class="docs-kcard">
+      <div class="dk-name" style="color:#ff8800">👑 QUEEN</div>
+      <div class="dk-body">Stationary hub. Spawns worker ants on a timer; faster with high repro gene. Lays eggs that hatch into ants. Dies without ants feeding it. The colony lives or dies with its queen — protect her or ensure ants can reach her.</div>
+    </div>
+    <div class="docs-kcard">
+      <div class="dk-name" style="color:#505058">🕷 SPIDER</div>
+      <div class="dk-body">Falls through air but clings to walls, plant walls, and web. Hunts ants and mites using venom. Lays web as it moves, creating climbing highways. Reproduces slowly. Too many spiders will crash the ant population — check their numbers.</div>
+    </div>
+    <div class="docs-kcard">
+      <div class="dk-name" style="color:#8c32c8">🍄 FUNGI</div>
+      <div class="dk-body">Spreads through dark damp zones. Decomposes detritus back into sand, closing the nutrient cycle. Killed by light. Releases spores that drift upward and establish new colonies. Without fungi, detritus accumulates and nutrients lock up.</div>
+    </div>
+    <div class="docs-kcard">
+      <div class="dk-name" style="color:#ff8c00">🪲 MITE</div>
+      <div class="dk-body">Fast-moving fungus-eaters. Kept in check by ants and spiders. Without mites, fungal blooms can take over the entire dark zone and choke out the substrate. Without fungi, mites starve and disappear.</div>
+    </div>
+  </div>
+
+  <div class="docs-h2">HOW TO START A BALANCED ECOSYSTEM</div>
+  <div class="docs-tip"><b>Step 1:</b> Use the STAMP tool to place a BOX or BOWL container. Add sand, water, and some gold sand inside for nutrients.</div>
+  <div class="docs-tip"><b>Step 2:</b> Place 8–12 plants near the bottom. They need sand or detritus to root in and light to grow. Move the sun with the ☀ SUN tool to point at them.</div>
+  <div class="docs-tip"><b>Step 3:</b> Drop 10–15 ants. They'll forage the plants and eventually crown a queen when well-fed. Watch population bars — you want plants to stay ahead of ants.</div>
+  <div class="docs-tip"><b>Step 4:</b> Add 5–10 fungi in dark areas away from direct sun (bottom corners, under overhang). They'll grow slowly if detritus is present.</div>
+  <div class="docs-tip"><b>Step 5:</b> Add 8–10 mites near fungal zones to prevent blooms. Add 2–4 spiders last — spiders are powerful and will crash an under-established ant colony.</div>
+  <div class="docs-tip"><b>Step 6:</b> Drop 3–5 Life Seeds ⚛ near gold sand. They'll self-replicate and drift into your organisms, gradually evolving their genomes.</div>
+
+  <div class="docs-h2">KEEPING POPULATIONS ALIVE</div>
+  <div class="docs-p"><b>Plants dying?</b> Check sun position — use ☀ SUN tool to aim the sun at your plant zone. Add more gold sand near roots. Make sure they're not buried under sand with no light access.</div>
+  <div class="docs-p"><b>Ants dying?</b> They need plants to eat. If plants are gone, add more manually. Queens starve if no ants feed them — if the queen dies, ants will eventually crown a new one when well-fed enough.</div>
+  <div class="docs-p"><b>No queens spawning?</b> Ants need to reach energy 220 to crown a queen. Make sure they're eating — add more plants. The ant population needs to be stable before queens appear.</div>
+  <div class="docs-p"><b>Spiders eating everything?</b> Add more ants, or manually erase some spiders. Spiders reproduce slowly so a brief population spike is self-correcting if ant numbers recover.</div>
+  <div class="docs-p"><b>Fungi taking over?</b> Add mites to dark zones. Move the sun to illuminate dark areas. Fire also kills fungi. Increasing light kills shade-obligate strains.</div>
+  <div class="docs-p"><b>Everything dead?</b> Add detritus to the substrate, re-seed with 🌱 SEED ECOSYSTEM, or reset and try again with a better container design.</div>
+
+  <div class="docs-h2">ELEMENTS</div>
+  <table class="docs-table">
+    <tr><th>ELEMENT</th><th>BEHAVIOUR</th></tr>
+    <tr><td>SAND ρ5</td><td>Falls, piles up. Foundation substrate for plants and ants.</td></tr>
+    <tr><td>GOLD SAND ρ8</td><td>Heavy, nutrient-rich. Plants grow faster near it. Mutagen reproduces near it.</td></tr>
+    <tr><td>WHITE SAND ρ3</td><td>Depleted, inert. Lighter than regular sand.</td></tr>
+    <tr><td>CLAY ρ5</td><td>Falls like sand then hardens after ~25 ticks. Once set, ants can tunnel through it cleanly. Great for building permanent structures.</td></tr>
+    <tr><td>WATER ρ2</td><td>Flows laterally. Hydrates plant zones, extinguishes fire, slows oil.</td></tr>
+    <tr><td>OIL ρ1</td><td>Floats on water. Highly flammable.</td></tr>
+    <tr><td>DETRITUS ρ4</td><td>Organic matter. Nutrient source for fungi. Forms from dead organisms. Plants can root in it.</td></tr>
+    <tr><td>WALL ρ∞</td><td>Permanent, indestructible. Only erase removes it.</td></tr>
+    <tr><td>FIRE</td><td>Spreads to organic material. Extinguished by water. Leaves detritus (ash).</td></tr>
+    <tr><td>LIFE SEED ⚛</td><td>Self-replicating mutagen. Drifts, evolves its own recipe genome rapidly, and mutates organisms it touches. Freeze in a FRIDGE container to preserve a specific strain.</td></tr>
+  </table>
+
+  <div class="docs-h2">TOOLS</div>
+  <table class="docs-table">
+    <tr><th>TOOL</th><th>USE</th></tr>
+    <tr><td>DRAW</td><td>Click+drag to place selected element. Overwrites existing cells.</td></tr>
+    <tr><td>ERASE</td><td>Click+drag to remove any cell including walls.</td></tr>
+    <tr><td>☀ SUN</td><td>Click to move the sun. Drag to track smoothly. Sun drives all plant photosynthesis.</td></tr>
+    <tr><td>⬛ STAMP</td><td>Single click to place a container shape. Choose from box, bowl, tube, funnel, divider, cross, or fridge.</td></tr>
+    <tr><td>👁 OBSERVE</td><td>Click or drag to inspect cells — shows type, HP, energy, genome, and strain info in the INSPECT panel.</td></tr>
+    <tr><td>✋ GRAB SEED</td><td>Click a Life Seed to pick it up. Click empty space to place it. Use this to move evolved mutagens between containers or into fridge storage.</td></tr>
+  </table>
+
+  <div class="docs-h2">STAMPS</div>
+  <div class="docs-p"><b>BOX / BOWL / TUBE / FUNNEL</b> — Wall containers for experiments. Walls are indestructible.</div>
+  <div class="docs-p"><b>DIVIDER / CROSS</b> — Divide the board into isolated zones. Useful for running parallel experiments.</div>
+  <div class="docs-p"><b>❄ FRIDGE</b> — A sealed blue-walled container. Any Life Seed inside is fully frozen — no movement, no mutation, no reproduction. The recipe is preserved exactly. Use the GRAB tool to move a specific mutagen into a fridge to save it, then release it later into your colony.</div>
+
+  <div class="docs-h2">EVOLUTION & GENOMES</div>
+  <div class="docs-p">Every organism has a 6-gene genome. Genes drift slightly each time an organism reproduces, creating new strains. The KINGDOMS ledger on the right tracks active strains — click any entry to inspect its full genome and traits.</div>
+  <div class="docs-p">Life Seeds accelerate evolution by touching organisms and shifting one gene in the direction of the seed's current recipe. Farm Life Seeds near gold sand or detritus to produce more. Place different seeds in separate fridge containers to maintain different evolutionary pressures you can deploy strategically.</div>
+  <div class="docs-p">Box rotation changes where "down" is. Organisms fall, settle, and climb in the new gravity direction. This is a powerful tool for reshaping the ecosystem — a flood of sand can bury a colony, rotating can expose a new water source, or scatter organisms across a fresh substrate.</div>
+
+  <div class="docs-h2">WORLD EVENTS</div>
+  <div class="docs-p">Every 600–2000 ticks a random event fires and a notification appears. Events are designed to stress the ecosystem and force adaptation:</div>
+  <table class="docs-table">
+    <tr><th>EVENT</th><th>EFFECT</th></tr>
+    <tr><td>DROUGHT</td><td>30% of water cells removed. Affects hydration and plant zones.</td></tr>
+    <tr><td>BLOOM</td><td>80 gold sand deposits scattered randomly. Nutrient surge.</td></tr>
+    <tr><td>WILDFIRE</td><td>8 fire ignitions in organic material zones.</td></tr>
+    <tr><td>PLAGUE</td><td>30% of all agents take 40 HP damage. Mass die-off possible.</td></tr>
+    <tr><td>SPORE STORM</td><td>30 new fungal colonies establish across the board.</td></tr>
+  </table>
+
+  <div style="margin-top:24px;font-size:7px;color:var(--dim);text-align:center;letter-spacing:2px;border-top:1px solid var(--border);padding-top:12px;">ALIEN ANT FARM · ALIEN ANT FARM · RIGHT-CLICK ANY CELL TO INSPECT · SCROLL TO CHANGE BRUSH SIZE</div>
+</div>
+</div>
+
+<!-- MUTATION POPUP -->
+<div id="mut-popup">
+  <div id="mut-card">
+    <button id="mut-card-close" onclick="closeMutPopup()">✕ CLOSE</button>
+    <div id="mut-card-content"></div>
+  </div>
+</div>
+
+
+<!-- OBSERVE TOOLTIP -->
+<div id="observe-tooltip"></div>
+
+<!-- CREATURE HOVER CARD (floating, outside popup) -->
+<div id="lab-creature-card" style="display:none;position:fixed;z-index:600;background:var(--panel);border:1px solid var(--accent3);padding:12px 14px;max-width:260px;max-height:80vh;overflow-y:auto;pointer-events:none;box-shadow:0 4px 24px rgba(0,0,0,0.9);font-family:var(--mono);font-size:8px;"></div>
+
+<!-- CREATURE LAB POPUP -->
+<div id="lab-popup">
+  <div id="lab-panel" style="max-width:960px;width:96vw;">
+    <button id="lab-close" onclick="closeLab()">✕ CLOSE</button>
+
+    <!-- LEFT: Builder (scrollable) -->
+    <div id="lab-left" style="min-width:340px;flex:1.4;max-height:85vh;overflow-y:auto;padding-right:6px;">
+      <div class="lab-title">🧬 CREATURE LAB</div>
+      <div class="lab-sub">Design a custom organism · <button class="lab-btn" style="display:inline;padding:2px 8px;font-size:8px;" onclick="generateCreature()">🎲 Randomize all</button></div>
+
+      <!-- ARCHETYPE (new) -->
+      <div class="lab-section">ARCHETYPE</div>
+      <div class="lab-form-grid">
+        <div class="lab-field" style="grid-column:span 2;">
+          <label>Organism type</label>
+          <select id="lab-archetype" onchange="onArchetypeChange()">
+            <option value="creature">🐛 Creature (mobile)</option>
+            <option value="plant">🌿 Plant-like (rooted, spreads)</option>
+            <option value="fungi">🍄 Fungus-like (network, dark)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Identity -->
+      <div style="display:flex;gap:10px;align-items:flex-start;margin-top:8px;">
+        <div>
+          <div id="lab-icon-display" style="width:52px;height:52px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:28px;cursor:pointer;border-radius:4px;background:var(--bg);" onclick="toggleIconPicker()" title="Click to change icon">?</div>
+          <div id="lab-icon-picker" style="display:none;position:absolute;z-index:999;background:var(--panel);border:1px solid var(--accent3);padding:6px;width:220px;max-height:140px;overflow-y:auto;flex-wrap:wrap;font-size:16px;line-height:1.8;cursor:pointer;"></div>
+        </div>
+        <div style="flex:1;">
+          <input type="text" class="lab-name-input" id="lab-name" placeholder="Name your creature..." maxlength="16">
+          <div style="margin-top:6px;display:flex;align-items:center;gap:6px;">
+            <span style="font-size:7px;color:var(--dim);">COLOR</span>
+            <input type="range" id="lab-hue" min="0" max="359" value="180" style="flex:1;accent-color:var(--accent);" oninput="updateLabColorPreview()">
+            <div id="lab-color-preview" style="width:20px;height:20px;border-radius:2px;border:1px solid var(--border);"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Physical -->
+      <div class="lab-section">PHYSICAL</div>
+      <div class="lab-form-grid">
+        <div class="lab-field">
+          <label>Size</label>
+          <select id="lab-size">
+            <option value="tiny">Tiny (30hp · fast)</option>
+            <option value="small">Small (60hp)</option>
+            <option value="medium" selected>Medium (100hp)</option>
+            <option value="large">Large (180hp · slow)</option>
+          </select>
+        </div>
+        <div class="lab-field" id="lab-movement-field">
+          <label>Movement</label>
+          <select id="lab-movement">
+            <option value="walker">🚶 Walker</option>
+            <option value="flyer">🦋 Flyer</option>
+            <option value="swimmer">🐟 Swimmer</option>
+            <option value="burrower">🐛 Burrower</option>
+            <option value="climber">🦎 Climber</option>
+            <option value="swarmer">🐝 Swarmer</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Behavior -->
+      <div class="lab-section" id="lab-section-behavior">BEHAVIOR</div>
+      <div class="lab-form-grid" id="lab-behavior-grid">
+        <div class="lab-field">
+          <label>Aggression <span id="lab-aggression-val" style="color:var(--accent);">50%</span></label>
+          <input type="range" id="lab-aggression" min="0" max="100" value="50" oninput="document.getElementById('lab-aggression-val').textContent=this.value+'%'">
+        </div>
+        <div class="lab-field">
+          <label>Reproduction <span id="lab-repro-val" style="color:var(--accent);">50%</span></label>
+          <input type="range" id="lab-repro" min="0" max="100" value="50" oninput="document.getElementById('lab-repro-val').textContent=this.value+'%'">
+        </div>
+        <div class="lab-field">
+          <label>Cowardice <span id="lab-fear-val" style="color:var(--accent);">30%</span></label>
+          <input type="range" id="lab-fear" min="0" max="100" value="30" oninput="document.getElementById('lab-fear-val').textContent=this.value+'%'">
+        </div>
+        <div class="lab-field">
+          <label>Repro type</label>
+          <select id="lab-repro-type">
+            <option value="budding">Budding</option>
+            <option value="egg_layer">Egg Layer</option>
+            <option value="spore">Spore</option>
+            <option value="cloning">Cloning</option>
+            <option value="flowering">🌸 Flowering</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Plant/fungi specific options -->
+      <div id="lab-plant-opts" style="display:none;">
+        <div class="lab-form-grid">
+          <div class="lab-field">
+            <label>Light req. <span id="lab-light-val" style="color:var(--accent);">40%</span></label>
+            <input type="range" id="lab-light-req" min="0" max="100" value="40" oninput="document.getElementById('lab-light-val').textContent=this.value+'%'">
+            <div style="font-size:6px;color:var(--dim);">Fungi: needs DARK (set low)</div>
+          </div>
+          <div class="lab-field">
+            <label>Spread speed <span id="lab-spread-val" style="color:var(--accent);">40%</span></label>
+            <input type="range" id="lab-spread" min="0" max="100" value="40" oninput="document.getElementById('lab-spread-val').textContent=this.value+'%'">
+          </div>
+          <div class="lab-field" style="grid-column:span 2;">
+            <label>Flowering: spawn element when blooming</label>
+            <select id="lab-flower-emit">
+              <option value="none">— None —</option>
+              <option value="spore">Spore cloud</option>
+              <option value="seed">Seeds</option>
+              <option value="water">Water droplets</option>
+              <option value="detritus">Detritus</option>
+              <option value="fire">Fire bloom</option>
+              <option value="acid">Acid droplets</option>
+              <option value="smoke">Smoke puffs</option>
+            </select>
+          </div>
+        </div>
+        <div class="lab-section" style="margin-top:8px;">HARMFUL TO <span style="font-size:7px;font-weight:normal;color:var(--dim);">(damages on contact)</span></div>
+        <div id="lab-harmful-list" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:4px;"></div>
+        <div style="font-size:6px;color:var(--dim);margin-bottom:6px;">Adjacent creatures take contact damage each tick</div>
+      </div>
+
+      <!-- Prey -->
+      <div class="lab-section" id="lab-section-prey">PREY <span style="font-size:7px;font-weight:normal;color:var(--dim);">(actively hunts)</span></div>
+      <div id="lab-prey-list" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px;"></div>
+
+      <!-- Allies -->
+      <div class="lab-section">ALLIES <span style="font-size:7px;font-weight:normal;color:var(--dim);">(never attacks)</span></div>
+      <div id="lab-ally-list" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px;"></div>
+
+      <!-- Hunted By (NEW) -->
+      <div class="lab-section">HUNTED BY <span style="font-size:7px;font-weight:normal;color:var(--dim);">(predators of this creature)</span></div>
+      <div id="lab-hunted-list" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px;"></div>
+
+      <!-- Feeding -->
+      <div class="lab-section">FEEDING</div>
+      <div class="lab-form-grid">
+        <div class="lab-field">
+          <label>Primary diet</label>
+          <select id="lab-diet">
+            <option value="omnivore">🍽️ Omnivore</option>
+            <option value="herbivore">🌿 Herbivore</option>
+            <option value="fungivore">🍄 Fungivore</option>
+            <option value="detritivore">🍂 Detritivore</option>
+            <option value="lithivore">🪨 Lithivore</option>
+            <option value="photosynthetic">☀️ Photosynthetic</option>
+            <option value="parasitic">🦠 Parasitic</option>
+            <option value="pyrotroph">🔥 Pyrotroph</option>
+            <option value="cryotroph">❄️ Cryotroph</option>
+          </select>
+        </div>
+        <div class="lab-field" id="lab-attack-field">
+          <label>Attack type</label>
+          <select id="lab-attack">
+            <option value="bite">🦷 Bite</option>
+            <option value="venom">☠️ Venom</option>
+            <option value="acid_spit">🧪 Acid spit</option>
+            <option value="fire_breath">🔥 Fire breath</option>
+            <option value="crush">💪 Crush</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Element Behaviors (NEW) -->
+      <div class="lab-section">ELEMENT BEHAVIORS <span style="font-size:7px;font-weight:normal;color:var(--dim);">(how creature reacts to each element)</span></div>
+      <div id="lab-elem-behaviors" style="display:flex;flex-direction:column;gap:3px;margin-bottom:8px;"></div>
+
+      <!-- Abilities -->
+      <div class="lab-section">SPECIAL ABILITIES</div>
+      <div id="lab-specials-list" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px;"></div>
+
+      <!-- Element tolerance -->
+      <div class="lab-section">ELEMENT TOLERANCES</div>
+      <div id="lab-tolerances" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px;"></div>
+
+      <div class="lab-btn-row">
+        <button class="lab-btn primary" onclick="saveCreature()">✓ SAVE CREATURE</button>
+      </div>
+    </div>
+
+    <!-- RIGHT: Saved list -->
+    <div id="lab-right" style="display:flex;flex-direction:column;gap:0;width:210px;min-width:190px;">
+      <div class="history-title">📜 SAVED CREATURES</div>
+      <div id="lab-history" style="flex:1;overflow-y:auto;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- WEATHER STATION PANEL -->
+<div id="ws-panel" style="display:none;position:fixed;bottom:60px;left:50%;transform:translateX(-50%);z-index:350;background:var(--panel);border:1px solid var(--accent3);padding:12px 16px;min-width:340px;font-family:var(--mono);">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+    <div style="font-family:var(--display);font-size:16px;letter-spacing:2px;color:var(--accent3);">🌡 WEATHER STATION</div>
+    <button onclick="document.getElementById('ws-panel').style.display='none'" style="background:transparent;border:1px solid var(--border);color:var(--dim);font-family:var(--mono);font-size:8px;padding:2px 8px;cursor:pointer;">✕</button>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:8px;">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span style="font-size:8px;color:var(--dim);width:70px;">PRECIPITATION</span>
+      <select id="ws-type" style="background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:8px;padding:3px;flex:1;">
+        <option value="water">💧 Rain (Water)</option>
+        <option value="acid">🟢 Acid Rain</option>
+        <option value="sand">🏜️ Sandstorm</option>
+        <option value="lava">🌋 Lava Fall</option>
+        <option value="ice">🧊 Hail (Ice)</option>
+        <option value="salt">🧂 Salt Storm</option>
+        <option value="smoke">💨 Smog</option>
+        <option value="steam">🌊 Steam</option>
+        <option value="ash">🩶 Ash Fall</option>
+        <option value="detritus">🍂 Nutrient Rain</option>
+        <option value="gunpowder">💥 Gunpowder</option>
+        <option value="fire">🔥 Fire Rain</option>
+        <option value="gold_sand">✨ Gold Rain</option>
+      </select>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span style="font-size:8px;color:var(--dim);width:70px;">INTENSITY</span>
+      <input type="range" id="ws-rate" min="1" max="20" value="3" style="flex:1;accent-color:var(--accent3);">
+      <span id="ws-rate-val" style="font-size:8px;color:var(--accent3);width:30px;">3</span>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:4px;">
+      <button onclick="wsSetRain(true)" id="ws-start" style="flex:1;background:rgba(0,255,136,0.1);border:1px solid var(--accent);color:var(--accent);font-family:var(--mono);font-size:8px;padding:6px;cursor:pointer;letter-spacing:1px;">▶ START</button>
+      <button onclick="wsSetRain(false)" style="flex:1;background:transparent;border:1px solid var(--border);color:var(--dim);font-family:var(--mono);font-size:8px;padding:6px;cursor:pointer;letter-spacing:1px;">⏹ STOP</button>
+    </div>
+    <div id="ws-status" style="font-size:7px;color:var(--dim);text-align:center;">IDLE</div>
+  </div>
+</div>
+
+<!-- PROG VOID CONFIG PANEL -->
+<div id="pv-panel" style="display:none;position:fixed;bottom:60px;left:50%;transform:translateX(-50%);z-index:350;background:var(--panel);border:1px solid #550077;padding:12px 16px;min-width:300px;font-family:var(--mono);">
+  <div style="font-family:var(--display);font-size:14px;letter-spacing:2px;color:#aa44ff;margin-bottom:10px;">⚙▼ PROG VOID CONFIG</div>
+  <div style="display:flex;flex-direction:column;gap:8px;">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span style="font-size:8px;color:var(--dim);width:70px;">DESTROYS</span>
+      <select id="pv-type" style="background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:8px;padding:3px;flex:1;">
+        <option value="water">💧 Water</option><option value="acid">🟢 Acid</option>
+        <option value="sand">🏜️ Sand</option><option value="lava">🌋 Lava</option>
+        <option value="ice">🧊 Ice</option><option value="salt">🧂 Salt</option>
+        <option value="smoke">💨 Smoke</option><option value="steam">🌊 Steam</option>
+        <option value="ash">🩶 Ash</option><option value="detritus">🍂 Detritus</option>
+        <option value="gunpowder">💥 Gunpowder</option><option value="fire">🔥 Fire</option>
+        <option value="oil">🛢️ Oil</option><option value="gold_sand">✨ Gold Sand</option>
+        <option value="cloud">☁ Cloud</option><option value="bloom_cloud">💥 Bloom Cloud</option>
+        <option value="sand_all">🏜️ All Sand types</option>
+        <option value="agents">🐛 All Creatures</option>
+      </select>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span style="font-size:8px;color:var(--dim);width:70px;">RADIUS</span>
+      <input type="range" id="pv-radius" min="1" max="8" value="2" style="flex:1;accent-color:#aa44ff;">
+      <span id="pv-radius-val" style="font-size:8px;color:#aa44ff;width:20px;">2</span>
+    </div>
+    <div style="font-size:7px;color:var(--dim);">Void destroys all matching elements within radius each tick.</div>
+  </div>
+</div>
+<div id="pc-panel" style="display:none;position:fixed;bottom:60px;left:50%;transform:translateX(-50%);z-index:350;background:var(--panel);border:1px solid var(--accent3);padding:12px 16px;min-width:300px;font-family:var(--mono);">
+  <div style="font-family:var(--display);font-size:14px;letter-spacing:2px;color:var(--accent3);margin-bottom:10px;">⚙☁ PROG CLOUD CONFIG</div>
+  <div style="display:flex;flex-direction:column;gap:8px;">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span style="font-size:8px;color:var(--dim);width:60px;">EMITS</span>
+      <select id="pc-type" style="background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:8px;padding:3px;flex:1;">
+        <option value="water">💧 Water</option><option value="acid">🟢 Acid</option>
+        <option value="sand">🏜️ Sand</option><option value="lava">🌋 Lava</option>
+        <option value="ice">🧊 Ice</option><option value="salt">🧂 Salt</option>
+        <option value="smoke">💨 Smoke</option><option value="steam">🌊 Steam</option>
+        <option value="ash">🩶 Ash</option><option value="detritus">🍂 Detritus</option>
+        <option value="gunpowder">💥 Gunpowder</option><option value="fire">🔥 Fire</option>
+        <option value="oil">🛢️ Oil</option><option value="gold_sand">✨ Gold Sand</option>
+      </select>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span style="font-size:8px;color:var(--dim);width:60px;">RATE</span>
+      <input type="range" id="pc-rate" min="5" max="200" value="30" style="flex:1;accent-color:var(--accent3);">
+      <span id="pc-rate-val" style="font-size:8px;color:var(--accent3);width:50px;">30 ticks</span>
+    </div>
+    <div style="font-size:7px;color:var(--dim);">Lower rate = more frequent drops. Place cloud to confirm.</div>
+  </div>
+</div>
+
+  <!-- ES module entry point — no build step required -->
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>
