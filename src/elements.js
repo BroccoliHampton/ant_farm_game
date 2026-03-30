@@ -367,7 +367,6 @@ export function stepProgVoid(x,y,p){
 // Weather station state
 export function wsRainType(){ return ({water:T.WATER,acid:T.ACID,sand:T.SAND,lava:T.LAVA,oil:T.OIL,salt:T.SALT,ice:T.ICE,fire:T.FIRE,steam:T.STEAM,ash:T.ASH,smoke:T.SMOKE,gunpowder:T.GUNPOWDER,detritus:T.DETRITUS})[ws_rain_type_key]||T.WATER; }
 
-export
 
 
 // ── Fire ────────────────────────────────────────────────────
