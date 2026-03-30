@@ -3,7 +3,8 @@
 //  Edit here to add new elements or adjust population caps.
 // ================================================================
 
-export const W = 120, H = 200;
+export const W = 120;
+export const H = 200;
 export const POP_GRAPH_MAX = 80;
 export const GDIRS = [{x:0,y:1},{x:1,y:0},{x:0,y:-1},{x:-1,y:0}];
 
