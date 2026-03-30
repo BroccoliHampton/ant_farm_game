@@ -488,13 +488,7 @@ document.querySelectorAll('.tbtn[data-tool]').forEach(btn=>{
     document.getElementById('stamp-picker').style.display=tool==='stamp'?'block':'none';
   });
 });
-document.getElementById('bs').addEventListener('input',e=>{brushSize=+e.target.value;document.getElementById('bsv').textContent=brushSize;});
-document.getElementById('sp').addEventListener('input',e=>{
-  const v=+e.target.value;speedMult=v===0?0:v*0.2;
-  document.getElementById('spv').textContent=v===0?'PAUSED':speedMult.toFixed(1)+'x';
-  document.getElementById('pause-badge').style.display=v===0?'block':'none';
 });
-document.getElementById('mu').addEventListener('input',e=>{mutRate=+e.target.value/10000;document.getElementById('muv').textContent=(mutRate*100).toFixed(2)+'%';});
 
 // Element buttons
 const el=document.getElementById('elist');
