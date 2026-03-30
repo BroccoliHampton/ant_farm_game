@@ -1,6 +1,6 @@
 // Canvas context — set by main.js at boot
-let _ctx=null,_canvas=null;
-export function initRenderer(canvas,ctx){ _canvas=canvas; _ctx=ctx; }
+let _ctx=null,_canvas=null,_S=4;
+export function initRenderer(canvas,ctx,s){ _canvas=canvas; _ctx=ctx; if(s)_S=s; }
 
 // ================================================================
 //  SIM — Particle dispatch, renderer, simulation loop
@@ -156,12 +156,12 @@ export function render(){
     const p=grid[idx(x,y)];
     if(!p){continue;}
     let col=getColor(p,x,y);
-    for(let dy=0;dy<S;dy++)for(let dx=0;dx<S;dx++)pixels[(y*S+dy)*canvas.width+(x*S+dx)]=col;
+    for(let dy=0;dy<_S;dy++)for(let dx=0;dx<_S;dx++)pixels[(y*_S+dy)*canvas.width+(x*_S+dx)]=col;
   }
 
   // Sun dot
   if(sunActive){
-    const sx=Math.round(sunX*S),sy=Math.round(sunY*S);
+    const sx=Math.round(sunX*_S),sy=Math.round(sunY*_S);
     for(let dy=-4;dy<=4;dy++)for(let dx=-4;dx<=4;dx++){if(dx*dx+dy*dy<=16){const px=sx+dx,py=sy+dy;if(px>=0&&px<canvas.width&&py>=0&&py<canvas.height)pixels[py*canvas.width+px]=0xFF32F0FF;}}
   }
 
@@ -172,11 +172,11 @@ export function render(){
   for(let i=0;i<W*H;i++){
     const p=grid[i];
     if(p?.t!==T.FROGSTONE||!p.isHub||!p.tongue) continue;
-    const bx=(i%W)*S+Math.floor(S/2);
-    const by=Math.floor(i/W)*S+Math.floor(S/2);
+    const bx=(i%W)*_S+Math.floor(_S/2);
+    const by=Math.floor(i/W)*_S+Math.floor(_S/2);
     const {tx,ty,hold,maxHold}=p.tongue;
-    const tipX=tx*S+Math.floor(S/2);
-    const tipY=ty*S+Math.floor(S/2);
+    const tipX=tx*_S+Math.floor(_S/2);
+    const tipY=ty*_S+Math.floor(_S/2);
     // Fade out as hold expires
     const alpha=0.95-0.15*(hold/maxHold);
     // Tongue body — hot pink
@@ -184,17 +184,17 @@ export function render(){
     _ctx.moveTo(bx,by);
     _ctx.lineTo(tipX,tipY);
     _ctx.strokeStyle=`rgba(255,60,170,${alpha})`;
-    _ctx.lineWidth=Math.max(2,Math.floor(S*0.5));
+    _ctx.lineWidth=Math.max(2,Math.floor(_S*0.5));
     _ctx.lineCap='round';
     _ctx.stroke();
     // Bright forked tip
     _ctx.beginPath();
-    _ctx.arc(tipX,tipY,Math.max(2,S*0.7),0,Math.PI*2);
+    _ctx.arc(tipX,tipY,Math.max(2,_S*0.7),0,Math.PI*2);
     _ctx.fillStyle=`rgba(255,160,220,${alpha})`;
     _ctx.fill();
     // Glow
     _ctx.beginPath();
-    _ctx.arc(tipX,tipY,Math.max(4,S*1.2),0,Math.PI*2);
+    _ctx.arc(tipX,tipY,Math.max(4,_S*1.2),0,Math.PI*2);
     _ctx.fillStyle=`rgba(255,80,160,${alpha*0.3})`;
     _ctx.fill();
   }
