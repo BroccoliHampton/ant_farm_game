@@ -13,7 +13,7 @@ import { grid, lightGrid, pheroGrid, POP, POP_HISTORY,
          setTool, setEl, setBrush, setIsDown, setSpeedMult,
          setSelectedCustom, setObserveMode, setBoxDrawStart,
          setWsRain, setSun, setGv, setBox, setHeldMutagen } from './state.js';
-import { idx, inB, get, set erase, abiotic, agentWithStrain,
+import { idx, inB, get, set, erase, abiotic, agentWithStrain,
          hslToRgb, makeBar, popIncr } from './utils.js';
 import { randomGenome, mutateGenome, registerStrain } from './genome.js';
 
