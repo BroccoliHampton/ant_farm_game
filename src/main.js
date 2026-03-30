@@ -1,19 +1,20 @@
 // ================================================================
 //  MAIN — Entry point: canvas setup, input events, game boot
 // ================================================================
-import { W, H, GDIRS } from './constants.js';
+import { W, H, GDIRS, K_COLORS, T } from './constants.js';
 import { grid, gv, sunX, sunY, sunActive, speedMult, brushSize, currentTool,
          currentEl, isDown, observeMode, savedSpeedMult, boxDrawStart,
+         boxTurns, boxAngle,
          setTool, setEl, setBrush, setIsDown, setSpeedMult, setSun,
          setGv, setBox, setObserveMode, setBoxDrawStart, setImageBuffer,
-         mutRate, setMutRate } from './state.js';
-import { idx, inB, get, erase, canvasToGrid } from './utils.js';
+         mutRate, setMutRate, setS } from './state.js';
+import { idx, inB, get, erase } from './utils.js';
 import { loop, initRenderer } from './sim.js';
 import { resetSim, seedLife, randomMap } from './world.js';
 import { drawAt, updateUI, updateHoverTip, inspectCell,
          enterObserveMode, exitObserveMode, updateBoxPreview, placeBoxDraw,
-         getStampMode, placeStamp, clientToCanvasLocal, dropHeld,
-         showEventToast, openDocs, closeDocs, buildRect,
+         getStampMode, placeStamp, dropHeld,
+         showEventToast, openDocs, closeDocs,
          wsSetRain, getProgVoidConfig, getProgCloudConfig } from './ui.js';
 import { openLab, closeLab, saveCreature, generateCreature, updateLabHistory,
          updateCustomList, deleteCreature, selectCustomCreature, spawnFromHistory,
@@ -21,32 +22,55 @@ import { openLab, closeLab, saveCreature, generateCreature, updateLabHistory,
          buildElemBehaviorTable, onArchetypeChange, updateLabColorPreview,
          cancelEdit } from './lab.js';
 
-// ── Canvas setup ──────────────────────────────────────────────
+// ── Canvas setup (deferred to DOMContentLoaded for correct measurements) ──
 const canvas = document.getElementById('c');
 const ctx = canvas.getContext('2d');
-const AVAIL_W = Math.min(window.innerWidth - 300, window.innerHeight * 0.6);
-const AVAIL_H = Math.floor(AVAIL_W * H / W);
-export const S = Math.max(2, Math.floor(AVAIL_W / W));
-canvas.width  = W * S;
-canvas.height = H * S;
-document.getElementById('canvas-wrap').style.width  = (W * S) + 'px';
-document.getElementById('canvas-wrap').style.height = (H * S) + 'px';
+const wrap = document.getElementById('canvas-wrap');
 
-const id = ctx.createImageData(W * S, H * S);
-const px = new Uint32Array(id.data.buffer);
-setImageBuffer(id, px);
-initRenderer(canvas, ctx);
-window._ctx = ctx;  // sim.js uses this via document.getElementById
+// Compute S using actual measured available width rather than window.innerWidth - 300
+// Defer to after DOM layout so panel widths are resolved
+function computeS() {
+  const left = document.getElementById('left');
+  const right = document.getElementById('right');
+  const lw = left ? left.offsetWidth : 130;
+  const rw = right ? right.offsetWidth : 150;
+  const availW = Math.min(
+    window.innerWidth - lw - rw - 20,
+    window.innerHeight * 0.88
+  );
+  return Math.max(2, Math.floor(availW / W));
+}
+
+export let S = 4; // sensible default while DOM loads
+
+function initCanvas() {
+  S = computeS();
+  canvas.width  = W * S;
+  canvas.height = H * S;
+  wrap.style.width  = (W * S) + 'px';
+  wrap.style.height = (H * S) + 'px';
+  const id = ctx.createImageData(W * S, H * S);
+  const px = new Uint32Array(id.data.buffer);
+  setImageBuffer(id, px);
+  setS(S);
+  initRenderer(canvas, ctx, S);
+}
 
 // ── Gravity & rotation ────────────────────────────────────────
 function applyRot(d){
-  boxTurns=((boxTurns+d)%4+4)%4;
-  boxAngle=boxTurns*90;
-  gv=GDIRS[boxTurns];
-  wrap.style.transform=`rotate(${boxAngle}deg)`;
-  document.getElementById('ang').textContent=`${boxAngle}°`;
-  // Counter-rotate hint text so it always reads right-side-up
-  document.getElementById('hint-text').style.transform=`rotate(${-boxAngle}deg)`;
+  const newTurns = (((boxTurns + d) % 4) + 4) % 4;
+  const newAngle = newTurns * 90;
+  setBox(newTurns, newAngle);
+  setGv(GDIRS[newTurns]);
+  wrap.style.transform = `rotate(${newAngle}deg)`;
+  document.getElementById('ang').textContent = `${newAngle}°`;
+  document.getElementById('hint-text').style.transform = `rotate(${-newAngle}deg)`;
+}
+
+// ── canvasToGrid — uses live S value ─────────────────────────
+function canvasToGrid(cx, cy) {
+  const rect = canvas.getBoundingClientRect();
+  return [Math.floor((cx - rect.left) / S), Math.floor((cy - rect.top) / S)];
 }
 document.getElementById('rcw').addEventListener('click',()=>applyRot(2));
 document.getElementById('rccw').addEventListener('click',()=>applyRot(2));
@@ -247,8 +271,21 @@ canvas.addEventListener('pointermove',e=>{
   setSun(gx,gy);
 });
 
-// ── Window resize ─────────────────────────────────────────────
-window.addEventListener('resize',()=>{ /* canvas is fixed size, no resize needed */ });
+// ── Window resize — reinit canvas on resize ───────────────────
+window.addEventListener('resize', ()=>{
+  const newS = computeS();
+  if(newS !== S){
+    S = newS;
+    canvas.width  = W * S;
+    canvas.height = H * S;
+    wrap.style.width  = (W * S) + 'px';
+    wrap.style.height = (H * S) + 'px';
+    const id2 = ctx.createImageData(W * S, H * S);
+    const px2 = new Uint32Array(id2.data.buffer);
+    setImageBuffer(id2, px2);
+    initRenderer(canvas, ctx, S);
+  }
+});
 
 // ── Keyboard shortcuts ────────────────────────────────────────
 document.addEventListener('keydown',e=>{
@@ -264,7 +301,17 @@ document.addEventListener('keydown',e=>{
   }
 });
 
-// ── Boot ──────────────────────────────────────────────────────
-resetSim();
-seedLife();
-requestAnimationFrame(loop);
+// ── Boot — wait for DOM layout so panel sizes are correct ─────
+document.addEventListener('DOMContentLoaded', ()=>{
+  initCanvas();
+  resetSim();
+  seedLife();
+  requestAnimationFrame(loop);
+});
+// Fallback if DOMContentLoaded already fired (module may load after)
+if(document.readyState==='complete'||document.readyState==='interactive'){
+  initCanvas();
+  resetSim();
+  seedLife();
+  requestAnimationFrame(loop);
+}
