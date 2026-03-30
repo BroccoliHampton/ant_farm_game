@@ -6,8 +6,8 @@ export function initRenderer(canvas,ctx,s){ _canvas=canvas; _ctx=ctx; if(s)_S=s;
 //  SIM — Particle dispatch, renderer, simulation loop
 //  Adjust buildOrder() to change update priority between elements.
 // ================================================================
-import { W, H, T, KINGDOM_HUE, K_COLORS } from './constants.js';
-import { grid, lightGrid, pheroGrid, POP, POP_MAX, POP_HISTORY, POP_GRAPH_MAX,
+import { W, H, T, KINGDOM_HUE, K_COLORS, POP_MAX, POP_GRAPH_MAX} from './constants.js';
+import { grid, lightGrid, pheroGrid, POP,  POP_HISTORY, 
          gv, sunX, sunY, sunActive, tickCount, incTick, speedMult, mutRate,
          lastPopSample, setLastPopSample, imageData, pixels, setImageBuffer,
          activeEvent, activeEventAge, setActiveEvent, setNextEvent, nextEvent,
