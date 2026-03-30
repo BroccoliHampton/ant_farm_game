@@ -2,8 +2,8 @@
 //  LAB — Creature Lab: define, edit, and manage custom organisms
 //  Edit SPECIAL_OPTIONS or KINGDOM_TARGETS to extend lab capabilities.
 // ================================================================
-import { T } from './constants.js';
-import { grid, POP, POP_MAX, POP_HISTORY, customCreatures, nextCustomId, incNextCustomId,
+import { T, POP_MAX, POP_GRAPH_MAX} from './constants.js';
+import { grid, POP,  POP_HISTORY, customCreatures, nextCustomId, incNextCustomId,
          mutRate, currentEl, selectedCustom, selectedIsQueen, historySelectedId,
          editingCreatureId, labIcon, labPreySet, labAllySet, labHuntedBySet,
          labHarmfulSet, labSpecialSet, labToleranceSet, labElemBehaviors,
