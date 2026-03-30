@@ -104,40 +104,6 @@ export const POP_MAX = {
   [T.FUNGI]:300,[T.MITE]:200,[T.QUEEN_SPIDER]:10,[T.QUEEN_MITE]:10,
 };
 
-// ── Element picker list ──────────────────────────────────────
-export const ELEMENTS=[
-  {cat:'KINGDOMS',key:'seed',        label:'PLANT SEED',   col:'#4aaa22',          tag:'🌱'},
-  {cat:null,      key:'ant',         label:'ANT',          col:K_COLORS[T.ANT],          tag:'🐜'},
-  {cat:null,      key:'queen',       label:'QUEEN ANT',    col:K_COLORS[T.QUEEN],        tag:'👑'},
-  {cat:null,      key:'spider',      label:'SPIDER',       col:K_COLORS[T.SPIDER],       tag:'🕷'},
-  {cat:null,      key:'queenSpider', label:'QUEEN SPIDER', col:K_COLORS[T.QUEEN_SPIDER], tag:'🕸👑'},
-  {cat:null,      key:'fungi',       label:'FUNGI',        col:K_COLORS[T.FUNGI],        tag:'🍄'},
-  {cat:null,      key:'mite',        label:'MITE',         col:K_COLORS[T.MITE],         tag:'🪲'},
-  {cat:null,      key:'queenMite',   label:'QUEEN MITE',   col:K_COLORS[T.QUEEN_MITE],   tag:'🪲👑'},
-  {cat:'SPECIAL', key:'mutagen', label:'LIFE SEED',  col:'#cc00ee',  tag:'⚛'},
-  {cat:null,      key:'cloud',       label:'CLOUD',        col:'#aaccee',  tag:'☁'},
-  {cat:null,      key:'bloomCloud',  label:'BLOOM CLOUD',  col:'#881020',  tag:'💥'},
-  {cat:null,      key:'progCloud',   label:'PROG CLOUD',   col:'#44aaff',  tag:'⚙☁'},
-  {cat:null,      key:'progVoid',    label:'PROG VOID',    col:'#220033',  tag:'⚙▼'},
-  {cat:null,      key:'fire',    label:'FIRE',       col:'#ff4400',  tag:'🔥'},
-  {cat:null,      key:'lava',    label:'LAVA',       col:'#ff5500',  tag:'ρ8'},
-  {cat:'ABIOTIC', key:'sand',    label:'SAND',       col:'#c4a35a',  tag:'ρ5'},
-  {cat:null,      key:'clay',    label:'CLAY',       col:'#7a8599',  tag:'ρ5'},
-  {cat:null,      key:'stone',   label:'STONE',      col:'#787878',  tag:'ρ7'},
-  {cat:null,      key:'wood',    label:'WOOD',       col:'#6e4020',  tag:'ρ4'},
-  {cat:null,      key:'ice',     label:'ICE',        col:'#b4e0f0',  tag:'ρ3'},
-  {cat:null,      key:'goldSand',label:'GOLD SAND',  col:'#ffc800',  tag:'ρ8'},
-  {cat:null,      key:'whiteSand',label:'WHT SAND',  col:'#dcdcd7', tag:'ρ3'},
-  {cat:null,      key:'salt',    label:'SALT',       col:'#e0e0e0',  tag:'ρ3'},
-  {cat:null,      key:'water',   label:'WATER',      col:'#3c82c8',  tag:'ρ2'},
-  {cat:null,      key:'acid',    label:'ACID',       col:'#ddaa00',  tag:'ρ2'},
-  {cat:null,      key:'oil',     label:'OIL',        col:'#4a7a28',  tag:'ρ1'},
-  {cat:null,      key:'ash',     label:'ASH',        col:'#888880',  tag:'ρ1'},
-  {cat:null,      key:'smoke',   label:'SMOKE',      col:'#505050',  tag:'↑'},
-  {cat:null,      key:'steam',   label:'STEAM',      col:'#c0d8e8',  tag:'↑'},
-  {cat:null,      key:'gunpowder',label:'GUNPOWDER', col:'#504840',  tag:'💥'},
-  {cat:null,      key:'wall',    label:'WALL',       col:'#3c3c3c',  tag:'ρ∞'},
-];
 
 // ── Hover tooltip labels/colors ──────────────────────────────
 export const TIP_LABELS={
