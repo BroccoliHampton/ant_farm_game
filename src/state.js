@@ -92,7 +92,7 @@ export let activeEvent=null, activeEventAge=0;
 export let rainActive=false, rainTicks=0, rainDuration=0;
 export let acidRainActive=false, acidRainTicks=0, acidRainDuration=0;
 export function setNextEvent(v){ nextEvent=v; }
-export function setActiveEvent(n,a){ activeEvent=n; activeEventAge=a; }
+export function setActiveEvent(n,a){ activeEvent=n; if(a!==undefined)activeEventAge=a; }
 export function setRain(a,t,d){ rainActive=a; rainTicks=t; rainDuration=d; }
 export function setAcidRain(a,t,d){ acidRainActive=a; acidRainTicks=t; acidRainDuration=d; }
 
