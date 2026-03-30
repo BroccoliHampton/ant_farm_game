@@ -2,7 +2,7 @@
 //  UTILS — Grid helpers, type checks, entity factories, pop tracking
 // ================================================================
 import { W, H, T, DENSITY, KINGDOM_HUE, K_COLORS } from './constants.js';
-import { grid, gv, fridgeZones, POP, strainRegistry, incNextStrain } from './state.js';
+import { grid, gv, fridgeZones, POP, strainRegistry, incNextStrain, getS } from './state.js';
 
 export const idx=(x,y)=>y*W+x;
 export const inB=(x,y)=>x>=0&&x<W&&y>=0&&y<H;
@@ -113,7 +113,7 @@ export function maybeMutateStrain(p,ng){
 export function canvasToGrid(cx,cy){
   const canvas=document.getElementById('c');
   const rect=canvas.getBoundingClientRect();
-  const S=Math.max(2,Math.floor(Math.min(window.innerWidth-300,window.innerHeight*0.6)/W));
+  const S=getS();
   const lx=cx-rect.left, ly=cy-rect.top;
   return [Math.floor(lx/S), Math.floor(ly/S)];
 }
