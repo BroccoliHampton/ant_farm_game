@@ -115,7 +115,6 @@ export function stepParticle(x,y){
 // ================================================================
 //  SPONTANEOUS EVENTS
 // ================================================================
-let nextEvent=800+Math.floor(Math.random()*800);
 const EVENTS=[
   {name:'DROUGHT',desc:'Water levels drop sharply across the board. Aquatic zones shrink and moisture-dependent organisms struggle.',fn:()=>{
     for(let i=0;i<W*H;i++){const p=grid[i];if(p?.t===T.WATER&&Math.random()<0.3)grid[i]=null;}
@@ -133,17 +132,13 @@ const EVENTS=[
     for(let n=0;n<30;n++){const x=Math.floor(Math.random()*W),y=Math.floor(Math.random()*H);if(!get(x,y)){const g=[128,180,200,40,120,180];set(x,y,agentWithStrain(T.FUNGI,g,registerStrain(T.FUNGI,g),{energy:80}));POP[T.FUNGI]++;}}
   }},
   {name:'RAINSTORM',desc:'Rain falls across the terrarium. Plants bloom, seeds germinate, and water pools on every surface.',fn:()=>{
-    rainActive=true; rainTicks=0; rainDuration=200+Math.floor(Math.random()*200);
+    setRain(true,0,200+Math.floor(Math.random()*200));
   }},
   {name:'ACID RAIN',desc:'Corrosive precipitation falls from above. Organic matter takes damage — only the resilient survive.',fn:()=>{
-    acidRainActive=true; acidRainTicks=0; acidRainDuration=80+Math.floor(Math.random()*80);
+    setAcidRain(true,0,80+Math.floor(Math.random()*80));
   }},
 ];
 
-let activeEvent=null,activeEventAge=0;
-// Rain state
-let rainActive=false,rainTicks=0,rainDuration=0;
-let acidRainActive=false,acidRainTicks=0,acidRainDuration=0;
 
 // ================================================================
 //  RENDER
