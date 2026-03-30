@@ -488,7 +488,6 @@ document.querySelectorAll('.tbtn[data-tool]').forEach(btn=>{
     document.getElementById('stamp-picker').style.display=tool==='stamp'?'block':'none';
   });
 });
-});
 
 // Element buttons
 const el=document.getElementById('elist');
