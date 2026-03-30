@@ -904,3 +904,6 @@ document.getElementById('lab-popup').addEventListener('click',e=>{if(e.target===
 buildOrder();
 resetSim();
 requestAnimationFrame(loop);
+
+// Listen for toast events dispatched by world.js (avoids circular import)
+document.addEventListener('game:toast', e => showEventToast(e.detail.name, e.detail.desc));
