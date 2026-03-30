@@ -72,17 +72,6 @@ export function hslToRgb(h,s,l){
   return[Math.round((r+m)*255),Math.round((g+m)*255),Math.round((b+m)*255)];
 }
 
-// Kingdom display colors (stable, not genome-derived for UI)
-const K_COLORS={
-  [T.PLANT]:'#1a6b1a',[T.ANT]:'#39ff14',[T.QUEEN]:'#ff8800',
-  [T.SPIDER]:'#505058',[T.FUNGI]:'#8c32c8',[T.MITE]:'#ff8c00',
-  [T.QUEEN_SPIDER]:'#cc44ff',[T.QUEEN_MITE]:'#ffdd44',
-};
-const K_NAMES={
-  [T.PLANT]:'PLANT',[T.ANT]:'ANT',[T.QUEEN]:'QUEEN',
-  [T.SPIDER]:'SPIDER',[T.FUNGI]:'FUNGI',[T.MITE]:'MITE',
-  [T.QUEEN_SPIDER]:'Q.SPIDER',[T.QUEEN_MITE]:'Q.MITE',
-};
 
 export function makeBar(val,max,col){
   const pct=Math.min(100,Math.round(val/max*100));
