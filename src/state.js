@@ -99,3 +99,8 @@ export function setAcidRain(a,t,d){ acidRainActive=a; acidRainTicks=t; acidRainD
 // Box draw
 export let boxDrawStart=null;
 export function setBoxDrawStart(v){ boxDrawStart=v; }
+
+// Canvas scale factor (set by main.js after DOM layout)
+export let _S=4;
+export function setS(v){ _S=v; }
+export function getS(){ return _S; }
