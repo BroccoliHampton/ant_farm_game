@@ -2,6 +2,7 @@
 //  UI — HUD, drawing tools, stamps, inspector, narrator, events
 // ================================================================
 import { W, H, T, K_COLORS, ELEMENTS, TIP_LABELS, TIP_COLORS } from './constants.js';
+import { getS } from './state.js';
 import { grid, lightGrid, pheroGrid, POP, POP_HISTORY, POP_MAX, POP_GRAPH_MAX,
          gv, sunX, sunY, sunActive, tickCount, speedMult, mutRate, brushSize,
          currentTool, currentEl, isDown, heldMutagen, customCreatures,
@@ -311,7 +312,7 @@ function canvasToGrid(cx,cy){
   const rad=-boxAngle*Math.PI/180,cos=Math.cos(rad),sin=Math.sin(rad);
   const rx=dx*cos-dy*sin,ry=dx*sin+dy*cos;
   const lx=rx+rect.width/2,ly=ry+rect.height/2;
-  return[Math.floor(lx*(canvas.width/rect.width)/S),Math.floor(ly*(canvas.height/rect.height)/S)];
+  const S=getS(); return[Math.floor(lx*(canvas.width/rect.width)/S),Math.floor(ly*(canvas.height/rect.height)/S)];
 }
 
 
