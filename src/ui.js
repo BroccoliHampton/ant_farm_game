@@ -284,18 +284,6 @@ export function updateHoverTip(clientX, clientY){
   tip.style.top=ty+'px';
 }
 
-function makeBar(val,max,col){
-  const pct=Math.min(100,Math.round(val/max*100));
-  return `<span style="display:inline-block;width:30px;height:4px;background:#1a1a30;border-radius:2px;vertical-align:middle;position:relative;"><span style="display:block;width:${pct}%;height:100%;background:${col};border-radius:2px;"></span></span>`;
-}
-function canvasToGrid(cx,cy){
-  const rect=canvas.getBoundingClientRect();
-  const dx=cx-rect.left-rect.width/2,dy=cy-rect.top-rect.height/2;
-  const rad=-boxAngle*Math.PI/180,cos=Math.cos(rad),sin=Math.sin(rad);
-  const rx=dx*cos-dy*sin,ry=dx*sin+dy*cos;
-  const lx=rx+rect.width/2,ly=ry+rect.height/2;
-  const S=getS(); return[Math.floor(lx*(canvas.width/rect.width)/S),Math.floor(ly*(canvas.height/rect.height)/S)];
-}
 
 
 // ── Draw Tool ────────────────────────────────────────────────
@@ -783,59 +771,10 @@ export function showEventToast(name, desc){
 // ================================================================
 //  CREATURE LAB — Custom organisms with generated traits
 // ================================================================
-const TRAIT_OPTIONS = {
-  movement:[
-    {id:'walker',name:'Walker',desc:'Walks on surfaces',icon:'🚶'},
-    {id:'flyer',name:'Flyer',desc:'Floats through air',icon:'🦋'},
-    {id:'swimmer',name:'Swimmer',desc:'Moves through water',icon:'🐟'},
-    {id:'burrower',name:'Burrower',desc:'Tunnels through sand',icon:'🐛'},
-    {id:'climber',name:'Climber',desc:'Clings to walls',icon:'🦎'},
-    {id:'swarmer',name:'Swarmer',desc:'Moves toward others',icon:'🐝'},
-  ],
-  diet:[
-    {id:'herbivore',name:'Herbivore',targets:[T.PLANT,T.SEED],icon:'🌿'},
-    {id:'carnivore',name:'Carnivore',targets:['agents'],icon:'🥩'},
-    {id:'fungivore',name:'Fungivore',targets:[T.FUNGI,T.SPORE],icon:'🍄'},
-    {id:'detritivore',name:'Detritivore',targets:[T.DETRITUS,T.ASH],icon:'🍂',desc:'Eats ash and detritus'},
-    {id:'lithivore',name:'Lithivore',targets:[T.STONE,T.SAND,T.GOLD_SAND],icon:'🪨',desc:'Eats minerals'},
-    {id:'photosynthetic',name:'Photosynthetic',targets:[],icon:'☀️'},
-    {id:'parasitic',name:'Parasitic',targets:['agents'],icon:'🦠'},
-    {id:'omnivore',name:'Omnivore',targets:[T.PLANT,T.FUNGI,T.DETRITUS,T.ASH],icon:'🍽️'},
-    {id:'pyrotroph',name:'Pyrotroph',targets:[T.LAVA,T.FIRE],icon:'🔥',desc:'Feeds on heat — immune to fire'},
-    {id:'cryotroph',name:'Cryotroph',targets:[T.ICE,T.WATER],icon:'❄️',desc:'Feeds on cold — thrives near ice'},
-  ],
-  reproduction:[
-    {id:'budding',name:'Budding',rate:0.02},
-    {id:'egg_layer',name:'Egg Layer',rate:0.01},
-    {id:'spore',name:'Spore Release',rate:0.008},
-    {id:'cloning',name:'Cloning',rate:0.015},
-  ],
-  special:[
-    {id:'bioluminescent',name:'Bioluminescent',icon:'💡'},
-    {id:'venomous',name:'Venomous',icon:'☠️'},
-    {id:'armored',name:'Armored',icon:'🛡️'},
-    {id:'regenerating',name:'Regenerating',icon:'💚'},
-    {id:'fire_immune',name:'Fire Immune',icon:'🔥'},
-    {id:'acid_immune',name:'Acid Resistant',icon:'🧪'},
-    {id:'pyro',name:'Pyromaniac',icon:'💥',desc:'Ignites nearby flammables'},
-    {id:'crystalline',name:'Crystalline',icon:'💎',desc:'Slowly converts neighbors to stone'},
-    {id:'smokescreen',name:'Smokescreen',icon:'💨',desc:'Emits smoke when threatened'},
-  ],
-  size:[
-    {id:'tiny',name:'Tiny',hp:30,energy:80,speed:2.0},
-    {id:'small',name:'Small',hp:60,energy:120,speed:1.5},
-    {id:'medium',name:'Medium',hp:100,energy:150,speed:1.0},
-    {id:'large',name:'Large',hp:180,energy:200,speed:0.6},
-  ],
-};
 
-const CREATURE_ICONS=['🐜','🐛','🦗','🦟','🐞','🦂','🦀','🐙','🦑','🐚','🐌','🦋','🐝','🪲','🪳','🦠','👾','👽','🤖','💀','👻','🔮','💎','⭐','🌟','✨','🌀','❄️','⚡','🌊','🍄','🌸','🌺','💜','💙','💚','💛','🧡','❤️'];
 
 // Custom creature state
-let pendingCreature = null;
-let selectedIsQueen = false;
 // Observe mode state
-let savedSpeedMult = 1;
 
 // ================================================================
 //  PROCEDURAL CREATURE INTERACTION GENERATOR
