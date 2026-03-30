@@ -129,7 +129,6 @@ const CREATURE_ICONS=['🐜','🐛','🦗','🦟','🐞','🦂','🦀','🐙','�
 // Custom creature state
 
 let pendingCreature = null;
-let selectedIsQueen = false;
 // Observe mode state
 let savedSpeedMult = 1;
 
