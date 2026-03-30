@@ -1,7 +1,7 @@
 // ================================================================
 //  UI — HUD, drawing tools, stamps, inspector, narrator, events
 // ================================================================
-import { W, H, T, K_COLORS, ELEMENTS, TIP_LABELS, TIP_COLORS } from './constants.js';
+import { W, H, T, K_COLORS, TIP_LABELS, TIP_COLORS } from './constants.js';
 import { getS } from './state.js';
 import { grid, lightGrid, pheroGrid, POP, POP_HISTORY, POP_MAX, POP_GRAPH_MAX,
          gv, sunX, sunY, sunActive, tickCount, speedMult, mutRate, brushSize,
@@ -221,24 +221,6 @@ export function inspectCell(clientX,clientY){
 // ================================================================
 //  HOVER TOOLTIP
 // ================================================================
-const TIP_LABELS={
-  [T.WALL]:'WALL',[T.FRIDGE_WALL]:'FRIDGE WALL',[T.CLAY]:'CLAY (wet)',[T.CLAY_HARD]:'CLAY (set)',[T.SAND]:'SAND',[T.GOLD_SAND]:'GOLD SAND',
-  [T.WHITE_SAND]:'WHITE SAND',[T.DETRITUS]:'DETRITUS',[T.WATER]:'WATER',
-  [T.OIL]:'OIL',[T.FIRE]:'FIRE',[T.MUTAGEN]:'LIFE SEED',
-  [T.PLANT]:'PLANT',[T.ANT]:'ANT',[T.QUEEN]:'QUEEN',
-  [T.SPIDER]:'SPIDER',[T.FUNGI]:'FUNGI',[T.MITE]:'MITE',
-  [T.PLANT_WALL]:'PLANT WALL',[T.WEB]:'WEB',[T.SPORE]:'SPORE',[T.EGG]:'EGG',
-  [T.FROGSTONE]:'FROGSTONE',
-};
-const TIP_COLORS={
-  [T.WALL]:'#888',[T.FRIDGE_WALL]:'#44aaee',[T.CLAY]:'#7a8599',[T.CLAY_HARD]:'#5e6a7a',[T.SAND]:'#c4a35a',[T.GOLD_SAND]:'#ffc800',
-  [T.WHITE_SAND]:'#dcdcd7',[T.DETRITUS]:'#7a6040',[T.WATER]:'#3c82c8',
-  [T.OIL]:'#4a7a28',[T.FIRE]:'#ff6600',[T.MUTAGEN]:'#cc44ff',
-  [T.PLANT]:K_COLORS[T.PLANT],[T.ANT]:K_COLORS[T.ANT],[T.QUEEN]:K_COLORS[T.QUEEN],
-  [T.SPIDER]:K_COLORS[T.SPIDER],[T.FUNGI]:K_COLORS[T.FUNGI],[T.MITE]:K_COLORS[T.MITE],
-  [T.PLANT_WALL]:'#226622',[T.WEB]:'#aaaaaa',[T.SPORE]:'#9955cc',[T.EGG]:'#ddcc88',
-  [T.FROGSTONE]:'#88cc44',
-};
 
 export function updateHoverTip(clientX, clientY){
   const tip=document.getElementById('hover-tip');
@@ -568,39 +550,6 @@ document.getElementById('sp').addEventListener('input',e=>{
 document.getElementById('mu').addEventListener('input',e=>{mutRate=+e.target.value/10000;document.getElementById('muv').textContent=(mutRate*100).toFixed(2)+'%';});
 
 // Element buttons
-const ELEMENTS=[
-  {cat:'KINGDOMS',key:'seed',        label:'PLANT SEED',   col:'#4aaa22',          tag:'🌱'},
-  {cat:null,      key:'ant',         label:'ANT',          col:K_COLORS[T.ANT],          tag:'🐜'},
-  {cat:null,      key:'queen',       label:'QUEEN ANT',    col:K_COLORS[T.QUEEN],        tag:'👑'},
-  {cat:null,      key:'spider',      label:'SPIDER',       col:K_COLORS[T.SPIDER],       tag:'🕷'},
-  {cat:null,      key:'queenSpider', label:'QUEEN SPIDER', col:K_COLORS[T.QUEEN_SPIDER], tag:'🕸👑'},
-  {cat:null,      key:'fungi',       label:'FUNGI',        col:K_COLORS[T.FUNGI],        tag:'🍄'},
-  {cat:null,      key:'mite',        label:'MITE',         col:K_COLORS[T.MITE],         tag:'🪲'},
-  {cat:null,      key:'queenMite',   label:'QUEEN MITE',   col:K_COLORS[T.QUEEN_MITE],   tag:'🪲👑'},
-  {cat:'SPECIAL', key:'mutagen', label:'LIFE SEED',  col:'#cc00ee',  tag:'⚛'},
-  {cat:null,      key:'cloud',       label:'CLOUD',        col:'#aaccee',  tag:'☁'},
-  {cat:null,      key:'bloomCloud',  label:'BLOOM CLOUD',  col:'#881020',  tag:'💥'},
-  {cat:null,      key:'progCloud',   label:'PROG CLOUD',   col:'#44aaff',  tag:'⚙☁'},
-  {cat:null,      key:'progVoid',    label:'PROG VOID',    col:'#220033',  tag:'⚙▼'},
-  {cat:null,      key:'fire',    label:'FIRE',       col:'#ff4400',  tag:'🔥'},
-  {cat:null,      key:'lava',    label:'LAVA',       col:'#ff5500',  tag:'ρ8'},
-  {cat:'ABIOTIC', key:'sand',    label:'SAND',       col:'#c4a35a',  tag:'ρ5'},
-  {cat:null,      key:'clay',    label:'CLAY',       col:'#7a8599',  tag:'ρ5'},
-  {cat:null,      key:'stone',   label:'STONE',      col:'#787878',  tag:'ρ7'},
-  {cat:null,      key:'wood',    label:'WOOD',       col:'#6e4020',  tag:'ρ4'},
-  {cat:null,      key:'ice',     label:'ICE',        col:'#b4e0f0',  tag:'ρ3'},
-  {cat:null,      key:'goldSand',label:'GOLD SAND',  col:'#ffc800',  tag:'ρ8'},
-  {cat:null,      key:'whiteSand',label:'WHT SAND',  col:'#dcdcd7', tag:'ρ3'},
-  {cat:null,      key:'salt',    label:'SALT',       col:'#e0e0e0',  tag:'ρ3'},
-  {cat:null,      key:'water',   label:'WATER',      col:'#3c82c8',  tag:'ρ2'},
-  {cat:null,      key:'acid',    label:'ACID',       col:'#ddaa00',  tag:'ρ2'},
-  {cat:null,      key:'oil',     label:'OIL',        col:'#4a7a28',  tag:'ρ1'},
-  {cat:null,      key:'ash',     label:'ASH',        col:'#888880',  tag:'ρ1'},
-  {cat:null,      key:'smoke',   label:'SMOKE',      col:'#505050',  tag:'↑'},
-  {cat:null,      key:'steam',   label:'STEAM',      col:'#c0d8e8',  tag:'↑'},
-  {cat:null,      key:'gunpowder',label:'GUNPOWDER', col:'#504840',  tag:'💥'},
-  {cat:null,      key:'wall',    label:'WALL',       col:'#3c3c3c',  tag:'ρ∞'},
-];
 const el=document.getElementById('elist');
 ELEMENTS.forEach(e=>{
   if(e.cat){const c=document.createElement('div');c.className='ecat';c.textContent='— '+e.cat+' —';el.appendChild(c);}
