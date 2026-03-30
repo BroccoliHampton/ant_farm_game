@@ -1,9 +1,9 @@
 // ================================================================
 //  UI — HUD, drawing tools, stamps, inspector, narrator, events
 // ================================================================
-import { W, H, T, K_COLORS, TIP_LABELS, TIP_COLORS } from './constants.js';
+import { W, H, T, K_COLORS, TIP_LABELS, TIP_COLORS, POP_MAX, POP_GRAPH_MAX} from './constants.js';
 import { getS } from './state.js';
-import { grid, lightGrid, pheroGrid, POP, POP_HISTORY, POP_MAX, POP_GRAPH_MAX,
+import { grid, lightGrid, pheroGrid, POP, POP_HISTORY,  
          gv, sunX, sunY, sunActive, tickCount, speedMult, mutRate, brushSize,
          currentTool, currentEl, isDown, heldMutagen, customCreatures,
          selectedCustom, selectedIsQueen, observeMode, savedSpeedMult,
@@ -13,8 +13,8 @@ import { grid, lightGrid, pheroGrid, POP, POP_HISTORY, POP_MAX, POP_GRAPH_MAX,
          setTool, setEl, setBrush, setIsDown, setSpeedMult,
          setSelectedCustom, setObserveMode, setBoxDrawStart,
          setWsRain, setSun, setGv, setBox, setHeldMutagen } from './state.js';
-import { idx, inB, get, set as gridSet, erase, abiotic, agentWithStrain,
-         hslToRgb, makeBar, canvasToGrid, popIncr } from './utils.js';
+import { idx, inB, get, set erase, abiotic, agentWithStrain,
+         hslToRgb, makeBar, popIncr } from './utils.js';
 import { randomGenome, mutateGenome, registerStrain } from './genome.js';
 
 // ── HUD & Population Graph ────────────────────────────────────
