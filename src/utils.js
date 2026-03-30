@@ -98,11 +98,3 @@ export function maybeMutateStrain(p,ng){
 
 // ================================================================
 //  CLAY PHYSICS
-
-export function canvasToGrid(cx,cy){
-  const canvas=document.getElementById('c');
-  const rect=canvas.getBoundingClientRect();
-  const S=getS();
-  const lx=cx-rect.left, ly=cy-rect.top;
-  return [Math.floor(lx/S), Math.floor(ly/S)];
-}
