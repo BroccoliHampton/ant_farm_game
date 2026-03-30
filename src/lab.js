@@ -745,5 +745,4 @@ export function selectCustomCreature(id,isQueen){
   updateCustomList();
 }
 
-// ---- Custom creature placement factory ----function spawnCustomCell(typeId,x,y,isQueen){
-  const def=customCreatures.get(typeId); if(!def)return null;
+// spawnCustomCell imported from kingdoms.js
