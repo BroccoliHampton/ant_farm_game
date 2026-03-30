@@ -489,25 +489,7 @@ document.querySelectorAll('.tbtn[data-tool]').forEach(btn=>{
   });
 });
 
-// Element buttons
-const el=document.getElementById('elist');
-ELEMENTS.forEach(e=>{
-  if(e.cat){const c=document.createElement('div');c.className='ecat';c.textContent='— '+e.cat+' —';el.appendChild(c);}
-  const btn=document.createElement('button');
-  btn.className='ebtn'+(e.key==='sand'?' active':'');
-  btn.dataset.el=e.key;
-  btn.innerHTML=`<span class="sw" style="background:${e.col}"></span><span class="en">${e.label}</span><span class="et">${e.tag}</span>`;
-  btn.addEventListener('click',()=>{
-    currentEl=e.key;currentTool='draw';
-    document.querySelectorAll('.ebtn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
-    document.querySelectorAll('.tbtn[data-tool]').forEach(b=>b.classList.remove('active'));
-    document.getElementById('btn-draw').classList.add('active');
-    // Show/hide config panels for special elements
-    document.getElementById('pc-panel').style.display=e.key==='progCloud'?'block':'none';
-    document.getElementById('pv-panel').style.display=e.key==='progVoid'?'block':'none';
-  });
-  el.appendChild(btn);
-});
+
 
 // ================================================================
 //  STAMPS
