@@ -17,6 +17,15 @@ import { idx, inB, get, set, erase, abiotic, agentWithStrain,
          hslToRgb, makeBar, popIncr } from './utils.js';
 import { randomGenome, mutateGenome, registerStrain } from './genome.js';
 
+// canvasToGrid — converts client coords to grid coords using live S
+function canvasToGrid(cx, cy) {
+  const canvas = document.getElementById('c');
+  if (!canvas) return [0, 0];
+  const rect = canvas.getBoundingClientRect();
+  const S = getS();
+  return [Math.floor((cx - rect.left) / S), Math.floor((cy - rect.top) / S)];
+}
+
 // ── HUD & Population Graph ────────────────────────────────────
 export function updateUI(){
   document.getElementById('tick').textContent=tickCount.toLocaleString();
@@ -460,55 +469,6 @@ document.getElementById('stamp-sel').addEventListener('change',()=>{
   boxDrawStart=null;
 });
 
-canvas.addEventListener('mousedown',e=>{
-  if(e.button===2){inspectCell(e.clientX,e.clientY);return;}
-  isDown=true;
-  if(currentTool==='stamp'&&getStampMode()==='box_draw'){
-    const[gx,gy]=canvasToGrid(e.clientX,e.clientY);
-    const[px,py]=clientToCanvasLocal(e.clientX,e.clientY);
-    boxDrawStart={gx,gy,px,py};
-    return;
-  }
-  drawAt(e.clientX,e.clientY);
-});
-
-canvas.addEventListener('mousemove',e=>{
-  if(observeMode){
-    const[gx,gy]=canvasToGrid(e.clientX,e.clientY);
-    showObserveTooltip(e.clientX,e.clientY,get(gx,gy),gx,gy);
-  }
-  if(isDown&&currentTool==='stamp'&&getStampMode()==='box_draw'&&boxDrawStart){
-    const[px,py]=clientToCanvasLocal(e.clientX,e.clientY);
-    // Scale preview to screen coords (canvas display vs actual)
-    const rect=canvas.getBoundingClientRect();
-    const scaleX=rect.width/canvas.width, scaleY=rect.height/canvas.height;
-    updateBoxPreview(
-      boxDrawStart.px*scaleX, boxDrawStart.py*scaleY,
-      px*scaleX, py*scaleY
-    );
-    return;
-  }
-  if(isDown&&currentTool!=='stamp'&&!observeMode) drawAt(e.clientX,e.clientY);
-  if(!observeMode) updateHoverTip(e.clientX,e.clientY);
-});
-
-canvas.addEventListener('mouseup',e=>{
-  if(currentTool==='stamp'&&getStampMode()==='box_draw'&&boxDrawStart){
-    const[gx,gy]=canvasToGrid(e.clientX,e.clientY);
-    placeBoxDraw(boxDrawStart.gx,boxDrawStart.gy,gx,gy);
-    document.getElementById('box-preview').style.display='none';
-    boxDrawStart=null;
-  }
-  isDown=false;
-});
-
-canvas.addEventListener('mouseleave',()=>{
-  isDown=false;
-  document.getElementById('hover-tip').style.display='none';
-  if(observeMode) document.getElementById('observe-tooltip').classList.remove('visible');
-  // Keep box preview visible if still drawing (user moved outside canvas)
-});
-canvas.addEventListener('contextmenu',e=>{e.preventDefault();inspectCell(e.clientX,e.clientY);});
 
 // ================================================================
 //  TOOL / ELEMENT BUTTONS
