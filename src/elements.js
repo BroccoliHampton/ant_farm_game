@@ -368,18 +368,7 @@ export function stepProgVoid(x,y,p){
 let ws_rain_type_key='water'; // key for element
 export function wsRainType(){ return ({water:T.WATER,acid:T.ACID,sand:T.SAND,lava:T.LAVA,oil:T.OIL,salt:T.SALT,ice:T.ICE,fire:T.FIRE,steam:T.STEAM,ash:T.ASH,smoke:T.SMOKE,gunpowder:T.GUNPOWDER,detritus:T.DETRITUS})[ws_rain_type_key]||T.WATER; }
 
-export function weatherTick(){
-  if(!ws_rain_active) return;
-  for(let d=0;d<ws_rain_rate;d++){
-    const rx=Math.floor(Math.random()*W);
-    const finalX=gv.y!==0?rx:(gv.x>0?0:W-1);
-    const finalY=gv.y>0?0:(gv.y<0?H-1:rx);
-    if(inB(finalX,finalY)&&!grid[idx(finalX,finalY)]){
-      const cell=makeProgCloudParticle(wsRainType());
-      if(cell) grid[idx(finalX,finalY)]=cell;
-    }
-  }
-}
+export
 
 
 // ── Fire ────────────────────────────────────────────────────
