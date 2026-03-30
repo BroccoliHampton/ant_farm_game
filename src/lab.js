@@ -127,14 +127,10 @@ const TRAIT_OPTIONS = {
 const CREATURE_ICONS=['🐜','🐛','🦗','🦟','🐞','🦂','🦀','🐙','🦑','🐚','🐌','🦋','🐝','🪲','🪳','🦠','👾','👽','🤖','💀','👻','🔮','💎','⭐','🌟','✨','🌀','❄️','⚡','🌊','🍄','🌸','🌺','💜','💙','💚','💛','🧡','❤️'];
 
 // Custom creature state
-const customCreatures = new Map();
 
 let pendingCreature = null;
-let selectedCustom = null;
 let selectedIsQueen = false;
-let historySelectedId = null;
 // Observe mode state
-let observeMode = false;
 let savedSpeedMult = 1;
 
 // ================================================================
